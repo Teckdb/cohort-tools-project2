@@ -5,6 +5,7 @@ const PORT = 5005
 const cors = require("cors")
 
 const mongoose = require("mongoose")
+const Cohort = require("./models/Cohort.model")
 
 const databaseName = 'cohort-tools-api'
 
@@ -66,24 +67,73 @@ app.delete('/api/students/:studentId', (req, res) => {
 
 
 // COHORT ROUTES
+
+app.post('/api/cohorts', (req, res) => {
+
+  const { cohortSlug, cohortName, program,
+    format, campus, startDate,
+    endDate, inProgress, programManager,
+    leadTeacher, totalHours } = req.body
+
+  Cohort
+    .create({
+      cohortSlug, cohortName, program,
+      format, campus, startDate,
+      endDate, inProgress, programManager,
+      leadTeacher, totalHours
+    })
+    .then(cohort => res.sendStatus(201))
+    .catch(err => res.status(500).json({ code: 500, message: 'Server error', details: err }))
+})
+
 app.get('/api/cohorts', (req, res) => {
-  res.send('test get all cohorts!')
+
+  Cohort
+    .find()
+    .then(cohort => res.json(cohort))
+    .catch(err => res.status(500).json({ code: 500, message: 'Server error', details: err }))
+
 })
 
 app.get('/api/cohorts/:cohortId', (req, res) => {
+
   const { cohortId } = req.params
-  res.send(cohortId)
+  Cohort
+    .findById(cohortId)
+    .then(cohort => res.json(cohort))
+    .catch(err => res.status(500).json({ code: 500, message: 'Server error', details: err }))
+
 })
 
-app.post('/api/cohorts', (req, res) => {
-  res.send('Creates a new cohort')
-})
 
 app.put('/api/cohorts/:cohortId', (req, res) => {
-  res.send('Updates the specified cohort by id')
+
+  const { cohortId } = req.params
+  const { cohortSlug, cohortName, program,
+    format, campus, startDate,
+    endDate, inProgress, programManager,
+    leadTeacher, totalHours } = req.body
+
+  Cohort
+    .findByIdAndUpdate(cohortId, {
+      cohortSlug, cohortName, program,
+      format, campus, startDate,
+      endDate, inProgress, programManager,
+      leadTeacher, totalHours
+    })
+    .then(cohort => res.sendStatus(200))
+    .catch(err => res.status(500).json({ code: 500, message: 'Server error', details: err }))
 })
 
 app.delete('/api/cohorts/:cohortsId', (req, res) => {
+
+  const { cohortId } = req.params
+
+  Cohort
+    .findByIdAndDelete(cohortId)
+    .then(cohort => res.sendStatus(200))
+    .catch(err => res.status(500).json({ code: 500, message: 'Server error', details: err }))
+
   res.send('Deletes the specified cohort by id ')
 })
 
