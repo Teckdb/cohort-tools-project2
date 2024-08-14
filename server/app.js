@@ -186,6 +186,7 @@ app.delete('/api/cohorts/:cohortsId', (req, res) => {
   res.send('Deletes the specified cohort by id ')
 })
 
+require("./error-handling")(app)
 
 // SERVER LISTENING
 app.listen(PORT, () => {
