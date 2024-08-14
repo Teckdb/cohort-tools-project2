@@ -5,6 +5,8 @@ const PORT = 5005
 const cors = require("cors")
 
 const mongoose = require("mongoose")
+const Student = require("./models/Student.model")
+const Cohort = require("./models/Cohort.model")
 
 const databaseName = 'cohort-tools-api'
 
@@ -32,37 +34,77 @@ app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 
 
-
 // STUDENT ROUTES
 app.post('/api/students', (req, res) => {
   res.send('prueba de post')
 })
 
 app.get('/api/students', (req, res) => {
-  res.send('prueba de get')
+  Student
+    .find()
+    .populate('cohort')
+    .then(student => res.json(student))
+    .catch(err => res.status(500).json({ code: 500, message: 'Server error', details: err }))
 })
 
 app.get('/api/students/cohort/:cohortId', (req, res) => {
   const { cohortId } = req.params
-  res.send(`prueba de get con endpoint en ${cohortId}`)
+
 })
 
 app.get('/api/students/:studentId', (req, res) => {
   const { studentId } = req.params
-  res.send(`prueba de get con endpoint en ${studentId}`)
+
+  Student
+    .findById(studentId)
+    .populate('cohort')
+    .then(student => res.json(student))
+    .catch(err => res.status(500).json({ code: 500, message: 'Server error', details: err }))
 })
 
 app.put('/api/students/:studentId', (req, res) => {
+
   const { studentId } = req.params
-  res.send(`prueba de get con endpoint en PUT de ${studentId}`)
+  const {
+    firstName,
+    lastName,
+    email,
+    phone,
+    linkedinUrl,
+    languages,
+    program,
+    background,
+    image,
+    cohort,
+    projects
+  } = req.body
+
+  Student
+    .findByIdAndUpdate(studentId, {
+      firstName,
+      lastName,
+      email,
+      phone,
+      linkedinUrl,
+      languages,
+      program,
+      background,
+      image,
+      cohort,
+      projects
+    })
+    .then(student => res.sendStatus(200))
+    .catch(err => res.status(500).json({ code: 500, message: 'Server error', details: err }))
 })
 
 app.delete('/api/students/:studentId', (req, res) => {
   const { studentId } = req.params
-  res.send(`prueba de get con endpoint en DELETE ${studentId}`)
+
+  Student
+    .findByIdAndDelete(studentId)
+    .then(student => { res.sendStatus(200) })
+    .catch(err => res.status(500).json({ code: 500, message: 'Server error', details: err }))
 })
-
-
 
 
 // COHORT ROUTES
@@ -72,6 +114,7 @@ app.get('/api/cohorts', (req, res) => {
 
 app.get('/api/cohorts/:cohortId', (req, res) => {
   const { cohortId } = req.params
+
   res.send(cohortId)
 })
 
@@ -86,7 +129,6 @@ app.put('/api/cohorts/:cohortId', (req, res) => {
 app.delete('/api/cohorts/:cohortsId', (req, res) => {
   res.send('Deletes the specified cohort by id ')
 })
-
 
 
 // SERVER LISTENING

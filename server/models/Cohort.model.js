@@ -51,5 +51,5 @@ const cohortSchema = new Schema({
     timestamps: true
 })
 
-const Cohort = model('Chort', cohortSchema)
+const Cohort = model('Cohort', cohortSchema)
 module.exports = Cohort
