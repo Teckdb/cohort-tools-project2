@@ -36,8 +36,15 @@ app.use(cookieParser())
 
 // STUDENT ROUTES
 app.post('/api/students', (req, res) => {
-  res.send('prueba de post')
+
+  const { firstName, LastName, email, phone, linkedinUrl, languages, program, background, image, cohort, projects } = req.body
+
+  Student
+    .create({ firstName, LastName, email, phone, linkedinUrl, languages, program, background, image, cohort, projects })
+    .then(student => res.sendStatus(201))
+    .catch(err => res.status(500).json({ code: 500, message: 'Server error', details: err }))
 })
+
 
 app.get('/api/students', (req, res) => {
   Student
