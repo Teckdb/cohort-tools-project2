@@ -5,6 +5,8 @@ const PORT = 5005
 const cors = require("cors")
 
 const mongoose = require("mongoose")
+const Student = require("./models/Student.model")
+const Cohort = require('./models/Cohort.model')
 
 const databaseName = 'cohort-tools-api'
 
@@ -35,16 +37,33 @@ app.use(cookieParser())
 
 // STUDENT ROUTES
 app.post('/api/students', (req, res) => {
-  res.send('prueba de post')
+
+  const { firstName, LastName, email, phone, linkedinUrl, languages, program, background, image, cohort, projects } = req.body
+
+  Student
+    .create({ firstName, LastName, email, phone, linkedinUrl, languages, program, background, image, cohort, projects })
+    .then(student => res.sendStatus(201))
+    .catch(err => res.status(500).json({ code: 500, message: 'Server error', details: err }))
 })
 
+
 app.get('/api/students', (req, res) => {
-  res.send('prueba de get')
+
+  Student
+    .find()
+    .populate('cohort')
+    .then(students => res.json(students))
+    .catch(err => console.log(err))
+
 })
 
 app.get('/api/students/cohort/:cohortId', (req, res) => {
   const { cohortId } = req.params
-  res.send(`prueba de get con endpoint en ${cohortId}`)
+
+  Student
+    .find({ cohort: `${cohortId}` })
+    .then(students => res.json(students))
+    .catch(err => console.log(err))
 })
 
 app.get('/api/students/:studentId', (req, res) => {
